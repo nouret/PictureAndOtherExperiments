@@ -27,7 +27,7 @@ main: main.o
 	./main 13 179 69 30 30 < Без\ имени.bmp > Без\ имени\(копия\).bmp
 	make clean
 
-main.o: main.cpp MyPictureFile.h
+main.o: main.cpp MyPictureFile.h BMP.h
 	g++ -c main.cpp
 
 clean:
