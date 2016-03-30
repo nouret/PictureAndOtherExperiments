@@ -62,16 +62,16 @@ int main(int argc, char* argv[]){
 	//MyPicture.info.x = 1000;
 	//MyPicture.info.y = 1000;
 	//MyPicture.Picture.resize(MyPicture.info.x);
-	for (int x = 0; x < (int) MyPicture.info.Width; ++x){
+	for (int x = 0; x < (int) MyPicture.info.Height; ++x){
 		//MyPicture[x].resize(MyPicture.info.y);
-		for (int y = 0; y < (int) MyPicture.info.Height; ++y){
-			MyPicture[x][y] = NewColor;
+		for (int y = 0; y < (int) MyPicture.info.Width; ++y){
+			//MyPicture[x][y] = NewColor;
 			//MyPicture[x][y].R = rand() % (MyPicture[x][y].R + 1);
 			//MyPicture[x][y].G = rand() % (MyPicture[x][y].G + 1);
 			//MyPicture[x][y].B = rand() % (MyPicture[x][y].B + 1);
 		}
 	}
-	//DFS(MyPicture.picture, StartX, StartY, NewColor);
+	DFS(MyPicture.picture, StartX, StartY, NewColor);
 	/*int x, y;
 	for (x = 0; x < (int) MyPicture.info.x / 2; ++x){
 		y = (MyPicture.info.x / 2);
