@@ -1,4 +1,4 @@
-all: try
+all: main
 
 qwe: qwe.o
 	g++ qwe.o -o qwe
@@ -22,13 +22,13 @@ deleteme: deleteme.o
 deleteme.o: deleteme.cpp
 	g++ -c deleteme.cpp
 
-try: try.o
-	g++ try.o -o try
-	./try 13 179 69 30 30 < Без\ имени.bmp > Без\ имени\(копия\).bmp
+main: main.o
+	g++ main.o -o main
+	./main 13 179 69 30 30 < Без\ имени.bmp > Без\ имени\(копия\).bmp
 	make clean
 
-try.o: try.cpp
-	g++ -c try.cpp
+main.o: main.cpp MyPictureFile.h
+	g++ -c main.cpp
 
 clean:
-	rm -rf try.o try deleteme.o deleteme Imj.o Imj qwe.o qwe
+	rm -rf try.o try deleteme.o deleteme Imj.o Imj qwe.o qwe main.o main
