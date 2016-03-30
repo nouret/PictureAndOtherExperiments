@@ -125,12 +125,13 @@ struct BMP_PICTURE{
 	void in(MyPictureFile infile){
 		header.in(infile);
 		info.in(infile, true);
-		int tmp = ((((info.Width * 3) + 3) << 2) >> 2) - info.Width * 3;
+		int tmp = ((((info.Width * 3) + 3) >> 2) << 2) - info.Width * 3;
 		picture.resize(info.Height);
 		unsigned char c;
 		//int tmp = ((((info.Height * 3) + 3) << 2) >> 2) - info.Height * 3;
 		//cerr << "| " << dec << info.Height * 3 << " " << ((((info.Height * 3) + 3) << 2) >> 2) - info.Height * 3 << endl;
 		cerr << "tmp: " << tmp << endl;
+		cerr << "Y: " << info.Height << " X: " << info.Width << endl;
 		for (int i = 0; i < info.Height; ++i){
 			picture[i].resize(info.Width);
 			for (int j = 0; j < info.Width; ++j){
