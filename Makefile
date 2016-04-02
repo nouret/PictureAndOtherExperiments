@@ -5,7 +5,6 @@ git:
 	git commit -m "auto 1"
 	git push
 	python3 massage.py > Makefile2
-	mv Makefile2 Makefile
 
 qwe: qwe.o
 	g++ qwe.o -o qwe
