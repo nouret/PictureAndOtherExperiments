@@ -24,10 +24,10 @@ deleteme.o: deleteme.cpp
 
 main: main.o
 	g++ main.o -o main
-	./main 13 179 69 30 30 < Без\ имени.bmp > Без\ имени\(копия\).bmp
+	./main 0 128 128 0 0 < Без\ имени.bmp > Без\ имени\(копия\).bmp
 	make clean
 
-main.o: main.cpp MyPictureFile.h BMP.h
+main.o: main.cpp MyPictureFile.h BMP.h random.h
 	g++ -c main.cpp
 
 clean:
