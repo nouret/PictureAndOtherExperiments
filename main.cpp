@@ -65,6 +65,7 @@ int main(int argc, char* argv[]){
 	//MyPicture.info.y = 1000;
 	//MyPicture.Picture.resize(MyPicture.info.x);
 	DRandom N;
+	DFS(MyPicture.picture, StartX, StartY, NewColor);
 	for (int x = 0; x < (int) MyPicture.info.Width; ++x){
 		//MyPicture[x].resize(MyPicture.info.y);
 		for (int y = 0; y < (int) MyPicture.info.Height; ++y){

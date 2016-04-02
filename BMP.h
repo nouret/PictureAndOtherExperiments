@@ -146,7 +146,6 @@ struct BMP_PICTURE{
 		header.out(outfile);
 		info.out(outfile, true);
 		int tmp = ((((info.Width * 3) + 3) >> 2) << 2) - info.Width * 3;
-		//int tmp = 3;
 		for (int i = 0; i < info.Height; ++i){
 			for (int j = 0; j < info.Width; ++j){
 				outfile.outu8_t(picture[j][i].B);
