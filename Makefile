@@ -4,7 +4,7 @@ git:
 	git add *.cpp *.h Makefile
 	git commit -m "work commit"
 	git push
-	massage.py
+	python3 massage.py
 
 qwe: qwe.o
 	g++ qwe.o -o qwe
