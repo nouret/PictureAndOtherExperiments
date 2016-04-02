@@ -14,6 +14,7 @@
 using namespace std; //is very bad
 
 const Color White = Color(255, 255, 255);
+const Color Black = Color(0, 0, 0);
 
 struct Error{
 	string s;
@@ -38,20 +39,15 @@ void DFS(vector<vector<Color> > & map, int x, int y, Color c){
 }
 
 int main(int argc, char* argv[]){
-	//fstream fin;
 	MyPictureFile MyFile;
 	MyFile.type = 2;
 	MyFile.infile = stdin;
 	MyFile.outfile = stdout;
-	//fin.open("Без имени.bmp", ios::in | ios::binary);
-	//if (!fin){ cout << "Файл не открыт\n";}
 	cerr << "gogogo!\n";
 	if (argc != 6) {
 		cerr << "Error\n";
 		return 0;
 	}
-	//char c;
-	//stdstream >> c;
 	Color NewColor;
 	NewColor.R = (uint8_t) atoi(argv[1]);
 	NewColor.G = (uint8_t) atoi(argv[2]);
@@ -60,31 +56,42 @@ int main(int argc, char* argv[]){
 	int StartY = (int) atoi(argv[5]);
 	cerr << (int) NewColor.R << " " << (int) NewColor.G << " " << (int) NewColor.B << endl;
 	BMP_PICTURE MyPicture;
-	//cin >> MyPicture;
 	MyPicture.in(MyFile);
-	//cerr << MyPicture.info.Width << " " << MyPicture.info.Height << endl;
-	//MyPicture.info.x = 1000;
-	//MyPicture.info.y = 1000;
-	//MyPicture.Picture.resize(MyPicture.info.x);
-	DRandom N;
+	DRandom Nomber;
 	//DFS(MyPicture.picture, StartX, StartY, NewColor);
-	for (int x = 0; x < (int) MyPicture.info.Width; ++x){
-		//MyPicture[x].resize(MyPicture.info.y);
-		for (int y = 0; y < (int) MyPicture.info.Height; ++y){
-			MyPicture[x][y] = White;
-			//MyPicture[x][y].R = rand() % (MyPicture[x][y].R + 1);
-			//MyPicture[x][y].G = rand() % (MyPicture[x][y].G + 1);
-			//MyPicture[x][y].B = rand() % (MyPicture[x][y].B + 1);
-			//cerr << x << " " << y << endl;
-			//MyPicture[x][y].R = (MyPicture[x][y].R + 5 * N.RangeRandom(0, 256, (x + y) / 10)) / 6;
-			//MyPicture[x][y].G = (MyPicture[x][y].G + 5 * N.RangeRandom(0, 256, (x + y) / 10)) / 6;
-			//MyPicture[x][y].B = (MyPicture[x][y].B + 5 * N.RangeRandom(0, 256, (x + y) / 10)) / 6;
-		}
+	int N = 100;
+	int X[N];
+	int Y[N];
+	Color Colors[N];
+	for (int _ = 0; _ < N; ++_){
+		X[_] = rand() % (int) MyPicture.info.Width;
+		Y[_] = rand() % (int) MyPicture.info.Height;
+		Colors[_].R = rand() % 255;
+		Colors[_].G = rand() % 255;
+		Colors[_].B = rand() % 255;
 	}
-	for (int i = 0; i < 10; ++i){
-		int x1 = rand() % ((int) MyPicture.info.Width), y1 = rand() % ((int) MyPicture.info.Height);
-		int x2 = rand() % ((int) MyPicture.info.Width), y2 = rand() % ((int) MyPicture.info.Height);
-		MyPicture.DrawLine(x1, y1, x2, y2, NewColor);
+	for (int x = 0; x < (int) MyPicture.info.Width; ++x){
+		for (int y = 0; y < (int) MyPicture.info.Height; ++y){
+			int dist, ans, min = MyPicture.info.Width * MyPicture.info.Width + MyPicture.info.Height * MyPicture.info.Height + 1;
+			bool b = false;
+			for (int _ = 0; _ < N; ++_){
+				dist = (X[_] - x) * (X[_] - x) + (Y[_] - y) * (Y[_] - y);
+				if (min == dist){
+					//b = true;
+				}
+				if (min > dist){
+					min = dist;
+					b = false;
+					ans = _;
+				}
+			}
+			if (b){
+				MyPicture[x][y] = Black;
+			}
+			else{
+				MyPicture[x][y] = Colors[ans];
+			}
+		}
 	}
 	//DFS(MyPicture.picture, StartX, StartY, NewColor);
 	MyPicture.out(MyFile);

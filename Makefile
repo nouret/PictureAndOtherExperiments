@@ -2,7 +2,7 @@ all: main
 
 git:
 	git add *.cpp *.h Makefile
-	git commit -m "auto 6"
+	git commit -m "auto 7"
 	git push
 	python3 massage.py > Makefile2
 	mv Makefile2 Makefile
@@ -39,4 +39,5 @@ main.o: main.cpp MyPictureFile.h BMP.h random.h
 
 clean:
 	rm -rf try.o try deleteme.o deleteme Imj.o Imj qwe.o qwe main.o main
+
 
