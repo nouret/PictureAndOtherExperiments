@@ -3,7 +3,7 @@ n = int(fin1.readline())
 n += 1
 fin1.close()
 fout1 = open("CommitNomber", "w")
-fout1.write(str(n - 1))
+fout1.write(str(n))
 fout1.close()
 fin2 = open("Makefile", "r")
 S = fin2.read()

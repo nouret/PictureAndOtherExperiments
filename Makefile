@@ -1,7 +1,7 @@
 all: main
 
 git:
-	git add *.cpp *.h Makefile
+	git add *.cpp *.h Makefile CommitNomber *.py
 	git commit -m "auto 7"
 	git push
 	python3 massage.py > Makefile2
