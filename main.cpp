@@ -13,6 +13,8 @@
 
 using namespace std; //is very bad
 
+const Color White = Color(255, 255, 255);
+
 struct Error{
 	string s;
 };
@@ -69,7 +71,7 @@ int main(int argc, char* argv[]){
 	for (int x = 0; x < (int) MyPicture.info.Width; ++x){
 		//MyPicture[x].resize(MyPicture.info.y);
 		for (int y = 0; y < (int) MyPicture.info.Height; ++y){
-			//MyPicture[x][y] = NewColor;
+			MyPicture[x][y] = White;
 			//MyPicture[x][y].R = rand() % (MyPicture[x][y].R + 1);
 			//MyPicture[x][y].G = rand() % (MyPicture[x][y].G + 1);
 			//MyPicture[x][y].B = rand() % (MyPicture[x][y].B + 1);
@@ -82,7 +84,6 @@ int main(int argc, char* argv[]){
 	for (int i = 0; i < 10; ++i){
 		int x1 = rand() % ((int) MyPicture.info.Width), y1 = rand() % ((int) MyPicture.info.Height);
 		int x2 = rand() % ((int) MyPicture.info.Width), y2 = rand() % ((int) MyPicture.info.Height);
-		cerr << x1 << " " << y1 << " " << x2 << " " << y2 << endl;
 		MyPicture.DrawLine(x1, y1, x2, y2, NewColor);
 	}
 	//DFS(MyPicture.picture, StartX, StartY, NewColor);

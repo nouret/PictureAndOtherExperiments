@@ -15,6 +15,12 @@ using namespace std;
 struct Color{
 	uint8_t B, G, R;
 
+	Color(int r = 0, int g = 0, int b = 0){
+		B = b;
+		G = g;
+		R = r;
+	}
+
 	bool operator == (Color y){
 		return B == y.B && G == y.G && R == y.R;
 	}
@@ -168,7 +174,6 @@ struct BMP_PICTURE{
 			return -1;
 		if (y1 < 0 || y2 < 0 || y1 >= info.Height || y2 >= info.Height)
 			return -1;
-		cerr << "x1 y1 x2 y2 " << x1 << " " << y1 << " " << x2 << " " << y2 << endl;
 		int nowx = x1;
 		int nowy = y1;
 		int distance1 = (x2 - nowx) * (x2 - nowx) + (y2 - nowy) * (y2 - nowy);
