@@ -1,5 +1,10 @@
 all: main
 
+git:
+	git add *.cpp *.h Makefile
+	git commit -m "work commit"
+	git push
+
 qwe: qwe.o
 	g++ qwe.o -o qwe
 	./qwe

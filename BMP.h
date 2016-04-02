@@ -157,5 +157,6 @@ struct BMP_PICTURE{
 				outfile.outu8_t(0);
 			}
 		}
+		cerr << (int) picture[5][5].R << " " << (int) picture[5][5].G << " " << (int) picture[5][5].B << " |" <<  endl;
 	}
 };

@@ -65,28 +65,17 @@ int main(int argc, char* argv[]){
 	//MyPicture.info.y = 1000;
 	//MyPicture.Picture.resize(MyPicture.info.x);
 	DRandom N;
-	/*
-	int Y[MyPicture.info.Height];
-	for (int i = 0; i < (int) MyPicture.info.Height; ++i){
-		Y[i] = 0;
-	}
-	for (int i = 0; i < 5000; ++i){
-		int tmp_x = ((int) MyPicture.info.Height) / 2 + NormalRand(0, ((int) MyPicture.info.Height) / 32);
-		if (tmp_x >= 0 && tmp_x < MyPicture.info.Height){
-			Y[tmp_x] += 3;
-		}
-	}
-	*/
-	for (int x = 0; x < (int) MyPicture.info.Height / 2; ++x){
+	for (int x = 0; x < (int) MyPicture.info.Width; ++x){
 		//MyPicture[x].resize(MyPicture.info.y);
-		for (int y = 0; y < (int) MyPicture.info.Width / 3; ++y){
+		for (int y = 0; y < (int) MyPicture.info.Height; ++y){
 			//MyPicture[x][y] = NewColor;
 			//MyPicture[x][y].R = rand() % (MyPicture[x][y].R + 1);
 			//MyPicture[x][y].G = rand() % (MyPicture[x][y].G + 1);
 			//MyPicture[x][y].B = rand() % (MyPicture[x][y].B + 1);
-			MyPicture[x][y].R = N.RangeRandom(0, 256);
-			MyPicture[x][y].G = N.RangeRandom(0, 256);
-			MyPicture[x][y].B = N.RangeRandom(0, 256);
+			//cerr << x << " " << y << endl;
+			MyPicture[x][y].R = (MyPicture[x][y].R + 5 * N.RangeRandom(0, 256, (x + y) / 10)) / 6;
+			MyPicture[x][y].G = (MyPicture[x][y].G + 5 * N.RangeRandom(0, 256, (x + y) / 10)) / 6;
+			MyPicture[x][y].B = (MyPicture[x][y].B + 5 * N.RangeRandom(0, 256, (x + y) / 10)) / 6;
 		}
 	}
 	

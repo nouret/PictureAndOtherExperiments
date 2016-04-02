@@ -23,11 +23,12 @@ public:
 		}
 		return random(mu, sigma);
 	}
-	int RangeRandom(int x, int y){
+
+	int RangeRandom(int x, int y, double c = 1){
 		double m = (double) (x + y) / 2;
-		double k = random(m, m / 8) + 0.5;
+		double k = random(m, c) + 0.5;
 		while ((int) k < x || (int) k >= y){
-			k = random(m, m / 8) + 0.5;
+			k = random(m, c) + 0.5;
 		}
 		return (int) k;
 	}
