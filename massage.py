@@ -1,0 +1,12 @@
+fin1 = open("CommitNomber", "r")
+n = int(fin1.readline())
+n += 1
+fin1.close()
+fout1 = open("CommitNomber", "w")
+fout1.write(str(n - 1))
+fout1.close()
+fin2 = open("Makefile", "r")
+S = fin2.read()
+fin2.close()
+S = S.replace('auto ' + str(n - 1), 'auto ' + str(n))
+print(S)
