@@ -126,18 +126,15 @@ struct BMP_PICTURE{
 		header.in(infile);
 		info.in(infile, true);
 		int tmp = ((((info.Width * 3) + 3) >> 2) << 2) - info.Width * 3;
-		picture.resize(info.Height);
-		unsigned char c;
-		//int tmp = ((((info.Height * 3) + 3) << 2) >> 2) - info.Height * 3;
-		//cerr << "| " << dec << info.Height * 3 << " " << ((((info.Height * 3) + 3) << 2) >> 2) - info.Height * 3 << endl;
-		cerr << "tmp: " << tmp << endl;
-		cerr << "Y: " << info.Height << " X: " << info.Width << endl;
+		picture.resize(info.Width);
+		for (int i = 0; i < info.Width; ++i){
+			picture[i].resize(info.Height);
+		}
 		for (int i = 0; i < info.Height; ++i){
-			picture[i].resize(info.Width);
 			for (int j = 0; j < info.Width; ++j){
-				picture[i][j].B = infile.inu8_t();
-				picture[i][j].G = infile.inu8_t();
-				picture[i][j].R = infile.inu8_t();
+				picture[j][i].B = infile.inu8_t();
+				picture[j][i].G = infile.inu8_t();
+				picture[j][i].R = infile.inu8_t();
 			}
 			for (int _ = 0; _ < tmp; ++_){
 				infile.in();
@@ -152,9 +149,9 @@ struct BMP_PICTURE{
 		//int tmp = 3;
 		for (int i = 0; i < info.Height; ++i){
 			for (int j = 0; j < info.Width; ++j){
-				outfile.outu8_t(picture[i][j].B);
-				outfile.outu8_t(picture[i][j].G);
-				outfile.outu8_t(picture[i][j].R);
+				outfile.outu8_t(picture[j][i].B);
+				outfile.outu8_t(picture[j][i].G);
+				outfile.outu8_t(picture[j][i].R);
 			}
 			for (int _ = 0; _ < tmp; ++_){
 				outfile.outu8_t(0);
