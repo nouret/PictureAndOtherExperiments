@@ -82,6 +82,7 @@ int main(int argc, char* argv[]){
 	for (int i = 0; i < 10; ++i){
 		int x1 = rand() % ((int) MyPicture.info.Width), y1 = rand() % ((int) MyPicture.info.Height);
 		int x2 = rand() % ((int) MyPicture.info.Width), y2 = rand() % ((int) MyPicture.info.Height);
+		cerr << x1 << " " << y1 << " " << x2 << " " << y2 << endl;
 		MyPicture.DrawLine(x1, y1, x2, y2, NewColor);
 	}
 	//DFS(MyPicture.picture, StartX, StartY, NewColor);

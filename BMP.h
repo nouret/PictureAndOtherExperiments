@@ -168,43 +168,43 @@ struct BMP_PICTURE{
 			return -1;
 		if (y1 < 0 || y2 < 0 || y1 >= info.Height || y2 >= info.Height)
 			return -1;
-		//cerr << "x1 y1 x2 y2 " << x1 << " " << y1 << " " << x2 << " " << y2 << endl;
+		cerr << "x1 y1 x2 y2 " << x1 << " " << y1 << " " << x2 << " " << y2 << endl;
 		int nowx = x1;
 		int nowy = y1;
 		int distance1 = (x2 - nowx) * (x2 - nowx) + (y2 - nowy) * (y2 - nowy);
 		int distance2 = info.Height * info.Height + info.Width * info.Width + 1;
 		int newdistance;
-		int distance;
+		int distance = distance2;
+		int sdx = 1;
+		if (x2 - x1 < 0)
+			sdx = -1;
+		if (x1 == x2)
+			sdx = 0;
+		int sdy = 1;
+		if (y2 - y1 < 0)
+			sdy = -1;
+		if (y1 == y2)
+			sdy = 0;
 		while (distance > 0){
-			//cerr << "distance: " << distance << endl;
-			//cerr << "y2 = " << y2 << endl;
 			//sleep(1);
-			int ans1 = 0;
-			int ans2 = 0;
-			for (int i = 0; i < 4; ++i){
-				int newx = nowx + X[i];
-				int newy = nowy + Y[i];
-				newdistance = (x2 - newx) * (x2 - newx) + (y2 - newy) * (y2 - newy);
-				//cerr << "newdistance, i " << newdistance << " " << i << endl;
-				if (newdistance < distance1){
-					distance2 = distance1;
-					distance1 = newdistance;
-					ans2 = ans1;
-					ans1 = i;
-				}
-				else{
-					if (newdistance < distance2){
-						ans2 = i;
-						distance2 = newdistance;
-					}
-				}
+			int X1, Y1, X2, Y2, S1, S2;
+			X1 = nowx + sdx;
+			Y1 = nowy;
+			X2 = nowx;
+			Y2 = nowy + sdy;
+			S1 = abs((x1 - X1) * (y2 - Y1) - (x2 - X1) * (y1 - Y1));
+			S2 = abs((x1 - X2) * (y2 - Y2) - (x2 - X2) * (y1 - Y2));
+			if (S1 < S2){
+				nowx = X1;
+				nowy = Y1;
 			}
-			nowx += X[ans1];
-			nowy += Y[ans1];
-			//cerr << "nowx, nowy" << nowx << " " << info.Width << " " << nowy << " " << info.Height << endl;
-			//cerr << "x2, y2: " << x2 << " " << y2 << endl;
-			//cerr << "distance: " << distance << endl;
+			else{
+				nowx = X2;
+				nowy = Y2;
+			}
 			distance = (x2 - nowx) * (x2 - nowx) + (y2 - nowy) * (y2 - nowy);
+			if (nowx < 0 || nowy < 0 || nowx >= info.Width || nowy >= info.Height)
+				return -1;
 			picture[nowx][nowy] = C;
 		}
 	}
