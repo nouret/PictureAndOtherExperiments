@@ -8,6 +8,8 @@
 #include <iostream>
 #include <vector>
 
+#include <unistd.h>
+
 using namespace std;
 
 struct Color{
@@ -156,6 +158,54 @@ struct BMP_PICTURE{
 				outfile.outu8_t(0);
 			}
 		}
-		cerr << (int) picture[5][5].R << " " << (int) picture[5][5].G << " " << (int) picture[5][5].B << " |" <<  endl;
+	}
+
+	int DrawLine(int x1, int y1, int x2, int y2, Color C){
+		const int X[] = {1, 0, -1, 0};
+		const int Y[] = {0, 1, 0, -1};
+		//cerr << "_________\n";
+		if (x1 < 0 || x2 < 0 || x1 >= info.Width || x2 >= info.Width)
+			return -1;
+		if (y1 < 0 || y2 < 0 || y1 >= info.Height || y2 >= info.Height)
+			return -1;
+		//cerr << "x1 y1 x2 y2 " << x1 << " " << y1 << " " << x2 << " " << y2 << endl;
+		int nowx = x1;
+		int nowy = y1;
+		int distance1 = (x2 - nowx) * (x2 - nowx) + (y2 - nowy) * (y2 - nowy);
+		int distance2 = info.Height * info.Height + info.Width * info.Width + 1;
+		int newdistance;
+		int distance;
+		while (distance > 0){
+			//cerr << "distance: " << distance << endl;
+			//cerr << "y2 = " << y2 << endl;
+			//sleep(1);
+			int ans1 = 0;
+			int ans2 = 0;
+			for (int i = 0; i < 4; ++i){
+				int newx = nowx + X[i];
+				int newy = nowy + Y[i];
+				newdistance = (x2 - newx) * (x2 - newx) + (y2 - newy) * (y2 - newy);
+				//cerr << "newdistance, i " << newdistance << " " << i << endl;
+				if (newdistance < distance1){
+					distance2 = distance1;
+					distance1 = newdistance;
+					ans2 = ans1;
+					ans1 = i;
+				}
+				else{
+					if (newdistance < distance2){
+						ans2 = i;
+						distance2 = newdistance;
+					}
+				}
+			}
+			nowx += X[ans1];
+			nowy += Y[ans1];
+			//cerr << "nowx, nowy" << nowx << " " << info.Width << " " << nowy << " " << info.Height << endl;
+			//cerr << "x2, y2: " << x2 << " " << y2 << endl;
+			//cerr << "distance: " << distance << endl;
+			distance = (x2 - nowx) * (x2 - nowx) + (y2 - nowy) * (y2 - nowy);
+			picture[nowx][nowy] = C;
+		}
 	}
 };

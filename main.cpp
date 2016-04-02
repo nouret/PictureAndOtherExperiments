@@ -65,7 +65,7 @@ int main(int argc, char* argv[]){
 	//MyPicture.info.y = 1000;
 	//MyPicture.Picture.resize(MyPicture.info.x);
 	DRandom N;
-	DFS(MyPicture.picture, StartX, StartY, NewColor);
+	//DFS(MyPicture.picture, StartX, StartY, NewColor);
 	for (int x = 0; x < (int) MyPicture.info.Width; ++x){
 		//MyPicture[x].resize(MyPicture.info.y);
 		for (int y = 0; y < (int) MyPicture.info.Height; ++y){
@@ -74,13 +74,16 @@ int main(int argc, char* argv[]){
 			//MyPicture[x][y].G = rand() % (MyPicture[x][y].G + 1);
 			//MyPicture[x][y].B = rand() % (MyPicture[x][y].B + 1);
 			//cerr << x << " " << y << endl;
-			MyPicture[x][y].R = (MyPicture[x][y].R + 5 * N.RangeRandom(0, 256, (x + y) / 10)) / 6;
-			MyPicture[x][y].G = (MyPicture[x][y].G + 5 * N.RangeRandom(0, 256, (x + y) / 10)) / 6;
-			MyPicture[x][y].B = (MyPicture[x][y].B + 5 * N.RangeRandom(0, 256, (x + y) / 10)) / 6;
+			//MyPicture[x][y].R = (MyPicture[x][y].R + 5 * N.RangeRandom(0, 256, (x + y) / 10)) / 6;
+			//MyPicture[x][y].G = (MyPicture[x][y].G + 5 * N.RangeRandom(0, 256, (x + y) / 10)) / 6;
+			//MyPicture[x][y].B = (MyPicture[x][y].B + 5 * N.RangeRandom(0, 256, (x + y) / 10)) / 6;
 		}
 	}
-	
-
+	for (int i = 0; i < 10; ++i){
+		int x1 = rand() % ((int) MyPicture.info.Width), y1 = rand() % ((int) MyPicture.info.Height);
+		int x2 = rand() % ((int) MyPicture.info.Width), y2 = rand() % ((int) MyPicture.info.Height);
+		MyPicture.DrawLine(x1, y1, x2, y2, NewColor);
+	}
 	//DFS(MyPicture.picture, StartX, StartY, NewColor);
 	MyPicture.out(MyFile);
 	return 0;
