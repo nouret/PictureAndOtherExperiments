@@ -39,12 +39,11 @@ void DFS(vector<vector<Color> > & map, int x, int y, Color c){
 }
 
 int main(int argc, char* argv[]){
-	MyPictureFile MyFile;
-	MyFile.type = 2;
-	MyFile.infile = stdin;
-	MyFile.outfile = stdout;
+	MyPictureFile InFile;
+	InFile.type = 2;
+	InFile.infile = stdin;
 	cerr << "gogogo!\n";
-	if (argc != 6) {
+	if (argc != 0) {
 		cerr << "Error\n";
 		return 0;
 	}
@@ -57,43 +56,7 @@ int main(int argc, char* argv[]){
 	cerr << (int) NewColor.R << " " << (int) NewColor.G << " " << (int) NewColor.B << endl;
 	BMP_PICTURE MyPicture;
 	MyPicture.in(MyFile);
-	DRandom Nomber;
-	//DFS(MyPicture.picture, StartX, StartY, NewColor);
-	int N = 100;
-	int X[N];
-	int Y[N];
-	Color Colors[N];
-	for (int _ = 0; _ < N; ++_){
-		X[_] = rand() % (int) MyPicture.info.Width;
-		Y[_] = rand() % (int) MyPicture.info.Height;
-		Colors[_].R = rand() % 255;
-		Colors[_].G = rand() % 255;
-		Colors[_].B = rand() % 255;
-	}
-	for (int x = 0; x < (int) MyPicture.info.Width; ++x){
-		for (int y = 0; y < (int) MyPicture.info.Height; ++y){
-			int dist, ans, min = MyPicture.info.Width * MyPicture.info.Width + MyPicture.info.Height * MyPicture.info.Height + 1;
-			bool b = false;
-			for (int _ = 0; _ < N; ++_){
-				dist = (X[_] - x) * (X[_] - x) + (Y[_] - y) * (Y[_] - y);
-				if (min == dist){
-					//b = true;
-				}
-				if (min > dist){
-					min = dist;
-					b = false;
-					ans = _;
-				}
-			}
-			if (b){
-				MyPicture[x][y] = Black;
-			}
-			else{
-				MyPicture[x][y] = Colors[ans];
-			}
-		}
-	}
-	//DFS(MyPicture.picture, StartX, StartY, NewColor);
-	MyPicture.out(MyFile);
+	MyPictureFile OutFile;
+	MyPicture.out(OutFile);
 	return 0;
 }

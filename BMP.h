@@ -24,6 +24,12 @@ struct Color{
 	bool operator == (Color y){
 		return B == y.B && G == y.G && R == y.R;
 	}
+
+	int distance(Color y){
+		return ((int) B - (int) y.B) * ((int) B - (int) y.B) + 
+			((int) G - (int) y.G) * ((int) G - (int) y.G) + 
+			((int) R - (int) y.R) * ((int) R - (int) y.R)
+	}
 };
 
 struct BITMAPFILEHEADER{
