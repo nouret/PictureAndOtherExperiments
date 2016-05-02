@@ -43,32 +43,31 @@ struct BITMAPFILEHEADER{
 	uint16_t bfReserved2;
 	uint32_t bfOffBits;
 
+	BITMAPFILEHEADER(int SIZE = 0){
+		bfType = 16973;
+		bfSize = SIZE;
+		bfReserved1 = 0;
+		bfReserved2 = 0;
+		bfOffBits = 54;
+	}
+
 	void in(MyPictureFile infile){
 		bfType = infile.in16_t(false);
 		if (bfType == 16973){ //424D
 			bfSize = infile.in32_t(true);
-			cerr << "bfSize: " << hex << bfSize << " " << dec << bfSize << endl;
 			bfReserved1 = infile.in16_t(true);
-			cerr << "bfReserved1: " << hex << bfReserved1 << " " << dec << bfReserved1 << endl;
 			bfReserved2 = infile.in16_t(true);
-			cerr << "bfReserved2: " << hex << bfReserved2 << " " << dec << bfReserved2 << endl;
 			bfOffBits = infile.in32_t(true);
-			cerr << "bfOffBits: " << hex << bfOffBits << " " << dec << bfOffBits << endl;
 		}
 	}
 
 	void out(MyPictureFile outfile){
 		outfile.out16_t(bfType, false);
 		if (bfType == 16973){
-			cerr << endl << endl;
 			outfile.out32_t(bfSize, true);
-			cerr << "bfSize: " << hex << bfSize << " " << dec << bfSize << endl;
 			outfile.out16_t(bfReserved1, true);
 			outfile.out16_t(bfReserved2, true);
 			outfile.out32_t(bfOffBits, true);
-			cerr << "bfReserved1: " << hex << bfReserved1 << " " << dec << bfReserved1 << endl;
-			cerr << "bfReserved2: " << hex << bfReserved2 << " " << dec << bfReserved2 << endl;
-			cerr << "bfOffBits: " << hex << bfOffBits << " " << dec << bfOffBits << endl;
 		}
 	}
 };
@@ -86,6 +85,21 @@ struct BITMAPINFO{
 	uint32_t ClrUsed;
 	uint32_t ClrImportant;
 	vector<unsigned char> something;
+
+	BITMAPINFO(int WIDTH = 0, int HEIGHT = 0, int SIZE = 0){
+		Size = 40;
+		Width = WIDTH;
+		Height = HEIGHT;
+		Planes = 1;
+		BitCount = 24;
+		Compression = 0;
+		SizeImage = SIZE;
+		XPelsPerMeter = 0;
+		YPelsPerMeter = 0;
+		ClrUsed = 0;
+		ClrImportant = 0;
+		something.clear();
+	}
 
 	void in(MyPictureFile infile, bool reverse){
 		Size = infile.in32_t(reverse);
@@ -136,6 +150,15 @@ struct BMP_PICTURE{
 	BITMAPINFO info;
 	vector<vector<Color> > picture;
 
+	BMP_PICTURE(int WIDTH = 0, int HEIGHT = 0, int SIZE1 = 0, int SIZE2 = 0){
+		header = BITMAPFILEHEADER(SIZE1);
+		info = BITMAPINFO(WIDTH, HEIGHT, SIZE2);
+		picture.resize(info.Width);
+		for (int i = 0; i < info.Width; ++i){
+			picture[i].resize(info.Height);
+		}
+	}
+
 	vector<Color> & operator [](int n){
 		return picture[n];
 	}
@@ -179,7 +202,6 @@ struct BMP_PICTURE{
 	int DrawLine(int x1, int y1, int x2, int y2, Color C){
 		const int X[] = {1, 0, -1, 0};
 		const int Y[] = {0, 1, 0, -1};
-		//cerr << "_________\n";
 		if (x1 < 0 || x2 < 0 || x1 >= info.Width || x2 >= info.Width)
 			return -1;
 		if (y1 < 0 || y2 < 0 || y1 >= info.Height || y2 >= info.Height)
