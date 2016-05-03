@@ -19,7 +19,7 @@ const Color White = Color(255, 255, 255);
 const Color Black = Color(0, 0, 0);
 const Color Green = Color(0, 255, 0);
 
-const int K = 100;
+const int K = 40;
 
 struct MyData{
 	unsigned int id;
