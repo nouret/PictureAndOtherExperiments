@@ -58,10 +58,16 @@ public:
 	vector<int> SumColorsG;
 	vector<int> SumColorsB;
 	vector<int> CountColors;
-	pthread_mutex_t * lock;
+	vector<MyData *> * friends;
+	//pthread_mutex_t * lock;
+	mutex * lock;
 	void run(){
 		iter();
 		cerr << "thread: " << id << endl;
+		if (id == 0){ //if I am the main thread;
+			lock -> lock();
+			lock -> unlock();
+		}
 	}
 	void iter(){
 		for (int i = 0; i < W; ++i){
@@ -136,9 +142,10 @@ int main(int argc, char* argv[]){
 		centers[_].B = rand() % 255;
 	}
 
-	MyData * Threads [NomberOfThreads];
+	vector<MyData *> Threads(NomberOfThreads);
 
-	pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
+	//pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
+	mutex lock;
 
 	for (int _ = 0; _ < NomberOfThreads; ++_){
 		Threads[_] = new MyData();
@@ -151,6 +158,7 @@ int main(int argc, char* argv[]){
 		Threads[_] -> SumColorsG.resize(K);
 		Threads[_] -> SumColorsB.resize(K);
 		Threads[_] -> CountColors.resize(K);
+		Threads[_] -> friends = & Threads;
 	}
 
 	while (not good){
