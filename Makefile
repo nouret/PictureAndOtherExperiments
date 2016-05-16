@@ -18,7 +18,7 @@ try.o: try.cpp
 
 git:
 	git add *.cpp *.h Makefile CommitNomber *.py *.bmp
-	git commit -m "auto 14"
+	git commit -m "auto 15"
 	git push
 	python3 massage.py > Makefile2
 	mv Makefile2 Makefile
@@ -83,6 +83,7 @@ clean:
 	rm -rf try.o try deleteme.o deleteme Imj.o Imj qwe.o qwe main.o main noise.o noise
 	rm -rf try2 try2.o pragma pragma.o mainfast.o mainfast
 	rm -rf try_mutex.out try_mutex.o
+
 
 
 

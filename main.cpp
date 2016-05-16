@@ -64,10 +64,15 @@ public:
 	void run(){
 		iter();
 		cerr << "thread: " << id << endl;
-		if (id == 0){ //if I am the main thread;
-			lock -> lock();
-			lock -> unlock();
+		lock -> lock();
+		for (int i = 0; i < 30; ++i){
+			cerr << i << " ";
 		}
+		cerr << endl;
+		if (id == 0){ //if I am the main thread;
+			cerr << "hgggu\n";
+		}
+		lock -> unlock();
 	}
 	void iter(){
 		for (int i = 0; i < W; ++i){
