@@ -9,16 +9,16 @@ pragma.o:
 	g++ -fopenmp -c pragma.cpp -o pragma.o
 
 try: try.o
-	g++ try.o -o try
+	g++ -pthread try.o -o try
 	./try
 	make clean
 
 try.o: try.cpp
-	g++ -c try.cpp
+	g++ -pthread -c try.cpp
 
 git:
 	git add *.cpp *.h Makefile CommitNomber *.py *.bmp
-	git commit -m "auto 11"
+	git commit -m "auto 12"
 	git push
 	python3 massage.py > Makefile2
 	mv Makefile2 Makefile
@@ -54,7 +54,7 @@ noise.o: noise.cpp MyPictureFile.h BMP.h random.h
 	g++ -c noise.cpp
 
 main: main.o
-	g++ main.o -o main
+	g++ -pthread main.o -o main -std=c++11
 	./main < Без\ имени\(копия\).bmp
 	#./main < qwerty.bmp
 	make clean
@@ -65,13 +65,14 @@ mainfast: mainfast.o
 	#./main < qwerty.bmp
 	make clean
 
-mainfast.o: main.cpp MyPictureFile.h BMP.h random.h
-	g++ -fopenmp -c main.cpp -o mainfast.o
+mainfast.o: mainfast.cpp MyPictureFile.h BMP.h random.h
+	g++ -fopenmp -c mainfast.cpp -o mainfast.o
 
 main.o: main.cpp MyPictureFile.h BMP.h random.h
-	g++ -c main.cpp
+	g++ -pthread -c main.cpp -std=c++11
 
 clean:
 	rm -rf try.o try deleteme.o deleteme Imj.o Imj qwe.o qwe main.o main noise.o noise try2 try2.o pragma pragma.o mainfast.o mainfast
+
 
 

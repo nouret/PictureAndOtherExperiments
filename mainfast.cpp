@@ -11,11 +11,7 @@
 #include <cmath>
 #include "random.h"
 
-#include <memory>
-#include <unistd.h>
-#include <pthread.h>
-
-#include <mutex>
+#include <omp.h>
 
 using namespace std; //is very bad
 
@@ -25,62 +21,12 @@ const Color Green = Color(0, 255, 0);
 
 const int K = 200;
 
-const int NomberOfThreads = 10;
-
-class Thread{
-private:
-	pthread_t thread;
-
-	Thread(const Thread& copy);         // copy constructor denied
-	static void *thread_func(void *d)   { ((Thread *)d)->run(); return NULL; }
-
-public:
-
-	Thread()             {}
-	virtual ~Thread()    {}
-
-	virtual void run() = 0;
-
-	int start()			{return pthread_create(&thread, NULL,
-							Thread::thread_func, (void*)this);}
-	int wait ()			{return pthread_join  (thread, NULL);}
-};
-
-//typedef std::auto_ptr<Thread> ThreadPtr;
-
-class MyData:public Thread{
-public:
-	int W, H;
+struct MyData{
 	unsigned int id;
-	vector<vector<Color> > * picture;
+	vector<Color> points;
 	vector<Color> questions;
-	vector<int> SumColorsR;
-	vector<int> SumColorsG;
-	vector<int> SumColorsB;
-	vector<int> CountColors;
-	pthread_mutex_t * lock;
-	void run(){
-		iter();
-		cerr << "thread: " << id << endl;
-	}
-	void iter(){
-		for (int i = 0; i < W; ++i){
-			for (int j = id; j < H; j += NomberOfThreads){
-				int min_dist_c = 256 * 256 * 3;
-				int index_min_dist_c;
-				for (int _ = 0; _ < K; ++_){
-					if (min_dist_c > questions[_].distance((*picture)[i][j])){
-						min_dist_c = questions[_].distance((*picture)[i][j]);
-						index_min_dist_c = _;
-					}
-				}
-				SumColorsR[index_min_dist_c] += (*picture)[i][j].R;
-				SumColorsG[index_min_dist_c] += (*picture)[i][j].G;
-				SumColorsB[index_min_dist_c] += (*picture)[i][j].B;
-				CountColors[index_min_dist_c] ++;
-			}
-		}
-	}
+	vector<int> ansver;
+	Color me;
 };
 
 struct Error{
@@ -136,68 +82,36 @@ int main(int argc, char* argv[]){
 		centers[_].B = rand() % 255;
 	}
 
-	MyData * Threads [NomberOfThreads];
+	vector<MyData> Threads;
+	int ThreadsCounter = 0;
 
-	pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
-
-	for (int _ = 0; _ < NomberOfThreads; ++_){
-		Threads[_] = new MyData();
-		Threads[_] -> lock = & lock;
-		Threads[_] -> W = (int) MyPicture.info.Width;
-		Threads[_] -> H = (int) MyPicture.info.Height;
-		Threads[_] -> id = _;
-		Threads[_] -> picture = & MyPicture.picture;
-		Threads[_] -> SumColorsR.resize(K);
-		Threads[_] -> SumColorsG.resize(K);
-		Threads[_] -> SumColorsB.resize(K);
-		Threads[_] -> CountColors.resize(K);
-	}
+	cerr << "sfdfsd" << endl;
 
 	while (not good){
+		#pragma omp parallel for
 		for (int _ = 0; _ < K; ++_){
 			SumColorsR[_] = 0;
 			SumColorsG[_] = 0;
 			SumColorsB[_] = 0;
 			CountColors[_] = 0;
 		}
-		for (int i = 0; i < NomberOfThreads; ++i){
-			Threads[i] -> questions.clear();
-			for (int _ = 0; _ < K; ++_){
-				Threads[i] -> questions.push_back(centers[_]);
-				Threads[i] -> SumColorsR[_] = 0;
-				Threads[i] -> SumColorsG[_] = 0;
-				Threads[i] -> SumColorsB[_] = 0;
-				Threads[i] -> CountColors[_] = 0;
-			}
-		}
-		for (int i = 0; i < NomberOfThreads; ++i){
-			if (Threads[i] -> start() != 0){
-				return EXIT_FAILURE;
-			}
-		}
-		for (int i = 0; i < NomberOfThreads; ++i){
-			if (Threads[i] -> wait() != 0){
-				return EXIT_FAILURE;
-			}
-		}
-		//Threads.resize((int) MyPicture.info.Width);
+		Threads.clear();
+		Threads.resize((int) MyPicture.info.Width);
 		/*
 		for (int i = 0; i < (int) MyPicture.info.Width; ++i){
-			Threads.push_back(new MyData());
-			Threads[i] -> id = ThreadsCounter;
-			Threads[i] -> points.resize(K);
+			Threads[i].id = ThreadsCounter;
+			Threads[i].points.resize(K);
 			++ThreadsCounter;
 			for (int _ = 0; _ < K; ++_){
-				Threads[i] -> points[_] = centers[_];
+				Threads[i].points[_] = centers[_];
 			}
-			Threads[i] -> questions.resize((int) MyPicture.info.Height);
+			Threads[i].questions.resize((int) MyPicture.info.Height);
 			for (int j = 0; j < (int) MyPicture.info.Height; ++j){
-				Threads[i] -> questions[j] = MyPicture[i][j];
+				Threads[i].questions[j] = MyPicture[i][j];
 			}
 		}
 		*/
-		
-		/*
+		#pragma omp parallel for
 		for (int i = 0; i < (int) MyPicture.info.Width; ++i){
 			//cerr << i << endl;
 			for (int j = 0; j < (int) MyPicture.info.Height; ++j){
@@ -215,28 +129,8 @@ int main(int argc, char* argv[]){
 				CountColors[index_min_dist_c] ++;
 			}
 		}
-		*/
-		for (int _ = 0; _ < K; ++_){
-			//cerr << "control: " << SumColorsR[_] << " - ";
-			SumColorsR[_] = 0;
-			for (int i = 0; i < NomberOfThreads; ++i){
-				SumColorsR[_] += Threads[i] -> SumColorsR[_];
-			}
-			//cerr << SumColorsR[_] << endl;
-			SumColorsG[_] = 0;
-			for (int i = 0; i < NomberOfThreads; ++i){
-				SumColorsG[_] += Threads[i] -> SumColorsG[_];
-			}
-			SumColorsB[_] = 0;
-			for (int i = 0; i < NomberOfThreads; ++i){
-				SumColorsB[_] += Threads[i] -> SumColorsB[_];
-			}
-			CountColors[_] = 0;
-			for (int i = 0; i < NomberOfThreads; ++i){
-				CountColors[_] += Threads[i] -> SumColorsR[_];
-			}
-		}
 		good = true;
+		#pragma omp parallel for
 		for (int _ = 0; _ < K; ++_){
 			if (CountColors[_] != 0){
 				if (((int) round(((double) SumColorsR[_]) / ((double) CountColors[_]))) != centers[_].R){
@@ -259,10 +153,10 @@ int main(int argc, char* argv[]){
 				}
 			}
 			else{
-				cerr << endl << (int)centers[_].R << " " << (int) centers[_].G << " " << (int) centers[_].B << endl;
+				cerr << centers[_].R << " " << centers[_].G << " " << centers[_].B << endl;
 			}
 		}
-		//good = true;
+		good = true;
 		/*
 		cerr << endl;
 		cerr << (int) centers[0].R << " " << (int) centers[0].G << " " << (int) centers[0].B << endl;
@@ -442,11 +336,13 @@ int main(int argc, char* argv[]){
 	//MyPictureFile OutFile;
 	//OutFile.type = 2;
 	//OutFile.outfile = stdout;
+	#pragma omp parallel for
 	for (int _ = 0; _ < K; ++_){
 		NewPicture[_].header = MyPicture.header;
 		NewPicture[_].info = MyPicture.info;
 		NewPicture[_].picture.resize((int) NewPicture[_].info.Width);
 	}
+	#pragma omp parallel for
 	for (int i = 0; i < (int) MyPicture.info.Width; ++i){
 		for (int _ = 0; _ < K; ++_){
 			NewPicture[_].picture[i].resize((int) MyPicture.info.Height);
@@ -454,6 +350,8 @@ int main(int argc, char* argv[]){
 		for (int j = 0; j < (int) MyPicture.info.Height; ++j){
 			for (int _ = 0; _ < K; ++_){
 				NewPicture[_][i][j] = White;
+				NewPicture[_][i][j].R = 250;
+				NewPicture[_][i][j].B = 250;
 			}
 			int min_dist_c = 256 * 256 * 3;
 			int index_min_dist_c;
@@ -507,5 +405,6 @@ int main(int argc, char* argv[]){
 	NewPicture[37].out(OutFile37);
 	NewPicture[38].out(OutFile38);
 	NewPicture[39].out(OutFile39);
+
 	return 0;
 }
