@@ -145,29 +145,33 @@ public:
 			}
 			CC[_] = 0;
 			for (int i = 0; i < NomberOfThreads; ++i){
-				CC[_] += (*friends)[i] -> SumColorsR[_];
+				CC[_] += (*friends)[i] -> CountColors[_];
 			}
+			cerr << "SCR: " << SCR[_] << " ";
+			cerr << "SCG: " << SCG[_] << " ";
+			cerr << "SCB: " << SCB[_] << " ";
 			cerr << "CC: " << CC[_] << endl;
 		}
+		good = true;
 		for (int _ = 0; _ < K; ++_){
-			cerr << "(" << (int) centers[_].R << " " << (int) centers[_].G << " " << (int) centers[_].B << ") - ";
+			//cerr << "(" << (int) centers[_].R << " " << (int) centers[_].G << " " << (int) centers[_].B << ") - ";
 			if (CC[_] != 0){
-				if (((int) round(((double) SCR[_]) / ((double) CC[_]))) != centers[_].R){
-//					cout << endl << (int) centers[_].R << " -R- ";
+				if ((int) ((((double) SCR[_]) / ((double) CC[_])) + 0.5) != centers[_].R){
+					cout << endl << (int) centers[_].R << " -R- ";
 					centers[_].R = (int) ((((double) SCR[_]) / ((double) CC[_])) + 0.5);
-//					cout << (int) centers[_].R << endl;
+					cout << (int) centers[_].R << endl;
 					good = false;
 				}
-				if (((int) round(((double) SCG[_]) / ((double) CC[_]))) != centers[_].G){
-//					cout << endl << (int) centers[_].G << " -G- ";
+				if ((int) ((((double) SCG[_]) / ((double) CC[_])) + 0.5) != centers[_].G){
+					cout << endl << (int) centers[_].G << " -G- ";
 					centers[_].G = (int) ((((double) SCG[_]) / ((double) CC[_])) + 0.5);
-//					cout << (int) centers[_].G << endl;
+					cout << (int) centers[_].G << endl;
 					good = false;
 				}
-				if (((int) round(((double) SCB[_]) / ((double) CC[_]))) != centers[_].B){
-//					cout << endl << (int) centers[_].B << " -B- ";
+				if ((int) ((((double) SCB[_]) / ((double) CC[_])) + 0.5) != centers[_].B){
+					cout << endl << (int) centers[_].B << " -B- ";
 					centers[_].B = (int) ((((double) SCB[_]) / ((double) CC[_])) + 0.5);
-//					cout << (int) centers[_].B << endl;
+					cout << (int) centers[_].B << endl;
 					good = false;
 				}
 				//cerr << "(" << (int) centers[_].R << " " << (int) centers[_].G << " " << (int) centers[_].B << ") - ";
