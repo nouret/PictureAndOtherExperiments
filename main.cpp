@@ -16,6 +16,7 @@
 #include <pthread.h>
 
 #include <mutex>
+#include <atomic>
 
 using namespace std; //is very bad
 
@@ -23,9 +24,12 @@ const Color White = Color(255, 255, 255);
 const Color Black = Color(0, 0, 0);
 const Color Green = Color(0, 255, 0);
 
-const int K = 200;
+const int K = 50;
 
 const int NomberOfThreads = 10;
+
+pthread_barrier_t MyBarrier;
+pthread_barrier_t OtherBarrier;
 
 class Thread{
 private:
@@ -53,44 +57,147 @@ public:
 	int W, H;
 	unsigned int id;
 	vector<vector<Color> > * picture;
-	vector<Color> questions;
-	vector<int> SumColorsR;
-	vector<int> SumColorsG;
-	vector<int> SumColorsB;
-	vector<int> CountColors;
+	//vector<Color> questions;
+	int SumColorsR[K];
+	int SumColorsG[K];
+	int SumColorsB[K];
+	int CountColors[K];
 	vector<MyData *> * friends;
+	int SCR[K];
+	int SCG[K];
+	int SCB[K];
+	int CC[K];
+	bool good;
+	Color centers[K];
 	//pthread_mutex_t * lock;
-	mutex * lock;
+	//atomic_int * counter;
+	//mutex * lock;
+	//bool main;
 	void run(){
 		iter();
-		cerr << "thread: " << id << endl;
-		lock -> lock();
-		for (int i = 0; i < 30; ++i){
-			cerr << i << " ";
-		}
-		cerr << endl;
-		if (id == 0){ //if I am the main thread;
-			cerr << "hgggu\n";
-		}
-		lock -> unlock();
 	}
 	void iter(){
-		for (int i = 0; i < W; ++i){
-			for (int j = id; j < H; j += NomberOfThreads){
-				int min_dist_c = 256 * 256 * 3;
-				int index_min_dist_c;
-				for (int _ = 0; _ < K; ++_){
-					if (min_dist_c > questions[_].distance((*picture)[i][j])){
-						min_dist_c = questions[_].distance((*picture)[i][j]);
-						index_min_dist_c = _;
+		good = false;
+		cerr << "thread: " << id << endl;
+		while (not good){
+			for (int _ = 0; _ < K; ++_){
+				SumColorsR[_] = 0;
+				SumColorsG[_] = 0;
+				SumColorsB[_] = 0;
+				CountColors[_] = 0;
+			}
+			for (int i = 0; i < W; ++i){
+				for (int j = id; j < H; j += NomberOfThreads){
+					int min_dist_c = 256 * 256 * 3;
+					int index_min_dist_c;
+					for (int _ = 0; _ < K; ++_){
+						if (min_dist_c > centers[_].distance((*picture)[i][j])){
+							min_dist_c = centers[_].distance((*picture)[i][j]);
+							index_min_dist_c = _;
+						}
 					}
+					SumColorsR[index_min_dist_c] += (*picture)[i][j].R;
+					SumColorsG[index_min_dist_c] += (*picture)[i][j].G;
+					SumColorsB[index_min_dist_c] += (*picture)[i][j].B;
+					CountColors[index_min_dist_c] ++;
 				}
-				SumColorsR[index_min_dist_c] += (*picture)[i][j].R;
-				SumColorsG[index_min_dist_c] += (*picture)[i][j].G;
-				SumColorsB[index_min_dist_c] += (*picture)[i][j].B;
-				CountColors[index_min_dist_c] ++;
+			}
+			int deleteme = 0;
+			for (int _ = 0; _ < K; ++_){
+				deleteme += CountColors[_];
+			}
+			cerr << "CountColors: " << deleteme << endl;
+			pthread_barrier_wait(&MyBarrier);
+			//cout << "thread | : " << id << endl;
+			if (id == 0){
+				good = single();
+				for (int i = 0; i < NomberOfThreads; ++i){
+					(*friends)[i] -> good = good;
+				}
+			}
+			pthread_barrier_wait(&OtherBarrier);
+		}
+	}
+
+	bool single(){
+		/*
+		for (int _ = 0; _ < K; ++_){
+			SCR[_] = 0;
+			SCG[_] = 0;
+			SCB[_] = 0;
+			CC[_] = 0;
+		}
+		*/
+		for (int _ = 0; _ < K; ++_){
+			//cerr << "control: " << SumColorsR[_] << " - ";
+			SCR[_] = 0;
+			for (int i = 0; i < NomberOfThreads; ++i){
+				SCR[_] += (*friends)[i] -> SumColorsR[_];
+			}
+			//cerr << SumColorsR[_] << endl;
+			SCG[_] = 0;
+			for (int i = 0; i < NomberOfThreads; ++i){
+				SCG[_] += (*friends)[i] -> SumColorsG[_];
+			}
+			SCB[_] = 0;
+			for (int i = 0; i < NomberOfThreads; ++i){
+				SCB[_] += (*friends)[i] -> SumColorsB[_];
+			}
+			CC[_] = 0;
+			for (int i = 0; i < NomberOfThreads; ++i){
+				CC[_] += (*friends)[i] -> SumColorsR[_];
+			}
+			cerr << "CC: " << CC[_] << endl;
+		}
+		for (int _ = 0; _ < K; ++_){
+			cerr << "(" << (int) centers[_].R << " " << (int) centers[_].G << " " << (int) centers[_].B << ") - ";
+			if (CC[_] != 0){
+				if (((int) round(((double) SCR[_]) / ((double) CC[_]))) != centers[_].R){
+//					cout << endl << (int) centers[_].R << " -R- ";
+					centers[_].R = (int) ((((double) SCR[_]) / ((double) CC[_])) + 0.5);
+//					cout << (int) centers[_].R << endl;
+					good = false;
+				}
+				if (((int) round(((double) SCG[_]) / ((double) CC[_]))) != centers[_].G){
+//					cout << endl << (int) centers[_].G << " -G- ";
+					centers[_].G = (int) ((((double) SCG[_]) / ((double) CC[_])) + 0.5);
+//					cout << (int) centers[_].G << endl;
+					good = false;
+				}
+				if (((int) round(((double) SCB[_]) / ((double) CC[_]))) != centers[_].B){
+//					cout << endl << (int) centers[_].B << " -B- ";
+					centers[_].B = (int) ((((double) SCB[_]) / ((double) CC[_])) + 0.5);
+//					cout << (int) centers[_].B << endl;
+					good = false;
+				}
+				//cerr << "(" << (int) centers[_].R << " " << (int) centers[_].G << " " << (int) centers[_].B << ") - ";
+			}
+			else{
+				//cerr << " - ";
+//				cerr << endl << (int)centers[_].R << " " << (int) centers[_].G << " " << (int) centers[_].B << endl;
 			}
 		}
+		cerr << endl;
+		//good = true;
+		for (int i = 0; i < NomberOfThreads; ++i){
+			//(*friends)[i] -> questions.clear();
+			for (int _ = 0; _ < K; ++_){
+				(*friends)[i] -> centers[_] = centers[_];
+				(*friends)[i] -> SumColorsR[_] = 0;
+				(*friends)[i] -> SumColorsG[_] = 0;
+				(*friends)[i] -> SumColorsB[_] = 0;
+				(*friends)[i] -> CountColors[_] = 0;
+			}
+		}
+		return good;
+		/*
+		if (not good){
+			for (int i = 1; i < NomberOfThreads; ++i){
+				cout << "run " << i << endl;
+				(*friends)[i] -> iter();
+			}
+		}
+		*/
 	}
 };
 
@@ -150,22 +257,56 @@ int main(int argc, char* argv[]){
 	vector<MyData *> Threads(NomberOfThreads);
 
 	//pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
-	mutex lock;
+	//mutex lock;
+
+	pthread_barrier_init(&MyBarrier, NULL, NomberOfThreads);
+	pthread_barrier_init(&OtherBarrier, NULL, NomberOfThreads);
 
 	for (int _ = 0; _ < NomberOfThreads; ++_){
 		Threads[_] = new MyData();
-		Threads[_] -> lock = & lock;
+		//Threads[_] -> lock = & lock;
 		Threads[_] -> W = (int) MyPicture.info.Width;
 		Threads[_] -> H = (int) MyPicture.info.Height;
 		Threads[_] -> id = _;
 		Threads[_] -> picture = & MyPicture.picture;
-		Threads[_] -> SumColorsR.resize(K);
-		Threads[_] -> SumColorsG.resize(K);
-		Threads[_] -> SumColorsB.resize(K);
-		Threads[_] -> CountColors.resize(K);
+		//Threads[_] -> SumColorsR.resize(K);
+		//Threads[_] -> SumColorsG.resize(K);
+		//Threads[_] -> SumColorsB.resize(K);
+		//Threads[_] -> CountColors.resize(K);
 		Threads[_] -> friends = & Threads;
+		//Threads[_] -> counter = 0;
 	}
 
+	for (int i = 0; i < NomberOfThreads; ++i){
+		//Threads[i] -> questions.clear();
+		for (int _ = 0; _ < K; ++_){
+			//Threads[i] -> questions.push_back(centers[_]);
+			Threads[i] -> SumColorsR[_] = 0;
+			Threads[i] -> SumColorsG[_] = 0;
+			Threads[i] -> SumColorsB[_] = 0;
+			Threads[i] -> CountColors[_] = 0;
+			for (int _ = 0; _ < K; ++_){
+				Threads[i] -> centers[_].R = centers[_].R;
+				Threads[i] -> centers[_].G = centers[_].G;
+				Threads[i] -> centers[_].B = centers[_].B;
+			}
+		}
+	}
+	for (int i = 0; i < NomberOfThreads; ++i){
+		if (Threads[i] -> start() != 0){
+			return EXIT_FAILURE;
+		}
+	}
+	for (int i = 0; i < NomberOfThreads; ++i){
+		if (Threads[i] -> wait() != 0){
+			return EXIT_FAILURE;
+		}
+	}
+	for (int i = 0; i < K; ++i){
+		centers[i] = Threads[0] -> centers[i];
+	}
+
+	/*
 	while (not good){
 		for (int _ = 0; _ < K; ++_){
 			SumColorsR[_] = 0;
@@ -229,6 +370,7 @@ int main(int argc, char* argv[]){
 			}
 		}
 		*/
+		/*
 		for (int _ = 0; _ < K; ++_){
 			//cerr << "control: " << SumColorsR[_] << " - ";
 			SumColorsR[_] = 0;
@@ -253,29 +395,29 @@ int main(int argc, char* argv[]){
 		for (int _ = 0; _ < K; ++_){
 			if (CountColors[_] != 0){
 				if (((int) round(((double) SumColorsR[_]) / ((double) CountColors[_]))) != centers[_].R){
-					cout << endl << (int) centers[_].R << " -R- ";
+//					cout << endl << (int) centers[_].R << " -R- ";
 					centers[_].R = (int) ((((double) SumColorsR[_]) / ((double) CountColors[_])) + 0.5);
-					cout << (int) centers[_].R << endl;
+//					cout << (int) centers[_].R << endl;
 					good = false;
 				}
 				if (((int) round(((double) SumColorsG[_]) / ((double) CountColors[_]))) != centers[_].G){
-					cout << endl << (int) centers[_].G << " -G- ";
+//					cout << endl << (int) centers[_].G << " -G- ";
 					centers[_].G = (int) ((((double) SumColorsG[_]) / ((double) CountColors[_])) + 0.5);
-					cout << (int) centers[_].G << endl;
+//					cout << (int) centers[_].G << endl;
 					good = false;
 				}
 				if (((int) round(((double) SumColorsB[_]) / ((double) CountColors[_]))) != centers[_].B){
-					cout << endl << (int) centers[_].B << " -B- ";
+//					cout << endl << (int) centers[_].B << " -B- ";
 					centers[_].B = (int) ((((double) SumColorsB[_]) / ((double) CountColors[_])) + 0.5);
-					cout << (int) centers[_].B << endl;
+//					cout << (int) centers[_].B << endl;
 					good = false;
 				}
 			}
 			else{
-				cerr << endl << (int)centers[_].R << " " << (int) centers[_].G << " " << (int) centers[_].B << endl;
+//				cerr << endl << (int)centers[_].R << " " << (int) centers[_].G << " " << (int) centers[_].B << endl;
 			}
 		}
-		//good = true;
+		good = true;
 		/*
 		cerr << endl;
 		cerr << (int) centers[0].R << " " << (int) centers[0].G << " " << (int) centers[0].B << endl;
@@ -288,7 +430,9 @@ int main(int argc, char* argv[]){
 			good = true;
 		}
 		*/
+	/*
 	}
+	*/
 	MyPictureFile OutFile0;
 	OutFile0.type = 2;
 	FILE * File0 = fopen("out0.bmp", "w");

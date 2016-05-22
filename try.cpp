@@ -3,7 +3,11 @@
 #include <memory>
 #include <unistd.h>
 #include <pthread.h>
-    
+
+#include <atomic>
+
+using namespace std;
+/*    
 class Thread
 {
 private:
@@ -57,4 +61,21 @@ int main(void)
         return EXIT_FAILURE;
 
     return EXIT_SUCCESS;
+}
+*/
+int main(){
+    const int num_mailboxes = 32;
+    std::atomic<int> mailbox[num_mailboxes];
+ 
+    // The writer threads update non-atomic shared data and then update mailbox[i] as follows
+    std::atomic_store_explicit(&mailbox[0], std::memory_order_release);
+ 
+    // Reader thread needs to check all mailbox[i], but only needs to sync with one
+    for (int i = 0; i < num_mailboxes; ++i) {
+        if (std::atomic_load_explicit(&mailbox[i],  std::memory_order_relaxed) == i) {
+            std::atomic_thread_fence(std::memory_order_acquire); // synchronize with just one writer
+            cout << i  << endl; // guaranteed to observe everything done in the writer thread before
+                    // the atomic_store_explicit()
+    }
+ }
 }
