@@ -29,7 +29,7 @@ const int K = 50;
 const int NomberOfThreads = 10;
 
 pthread_barrier_t MyBarrier;
-pthread_barrier_t OtherBarrier;
+//pthread_barrier_t OtherBarrier;
 
 class Thread{
 private:
@@ -115,7 +115,8 @@ public:
 					(*friends)[i] -> good = good;
 				}
 			}
-			pthread_barrier_wait(&OtherBarrier);
+			//pthread_barrier_wait(&OtherBarrier);
+			pthread_barrier_wait(&MyBarrier);
 		}
 	}
 
@@ -264,7 +265,7 @@ int main(int argc, char* argv[]){
 	//mutex lock;
 
 	pthread_barrier_init(&MyBarrier, NULL, NomberOfThreads);
-	pthread_barrier_init(&OtherBarrier, NULL, NomberOfThreads);
+	//pthread_barrier_init(&OtherBarrier, NULL, NomberOfThreads);
 
 	for (int _ = 0; _ < NomberOfThreads; ++_){
 		Threads[_] = new MyData();
