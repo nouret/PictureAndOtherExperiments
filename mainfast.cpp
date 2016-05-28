@@ -13,13 +13,15 @@
 
 #include <omp.h>
 
+#include <time.h>
+
 using namespace std; //is very bad
 
 const Color White = Color(255, 255, 255);
 const Color Black = Color(0, 0, 0);
 const Color Green = Color(0, 255, 0);
 
-const int K = 200;
+const int K = 50;
 
 struct MyData{
 	unsigned int id;
@@ -55,7 +57,7 @@ int main(int argc, char* argv[]){
 	MyPictureFile InFile;
 	InFile.type = 2;
 	InFile.infile = stdin;
-	cerr << "gogogo!\n";
+	//cerr << "gogogo!\n";
 	if (argc != 1) {
 		cerr << "Error\n";
 		return 0;
@@ -82,10 +84,14 @@ int main(int argc, char* argv[]){
 		centers[_].B = rand() % 255;
 	}
 
-	vector<MyData> Threads;
-	int ThreadsCounter = 0;
+	//vector<MyData> Threads;
+	//int ThreadsCounter = 0;
 
-	cerr << "sfdfsd" << endl;
+	//cerr << "sfdfsd" << endl;
+
+	timespec StartTimespec;
+	clock_gettime(CLOCK_REALTIME, &StartTimespec /*clockid_t clk_id, struct timespec *res*/);
+	double Start = (double) StartTimespec.tv_sec + (double) StartTimespec.tv_nsec / 1000000000.;
 
 	while (not good){
 		#pragma omp parallel for
@@ -95,8 +101,8 @@ int main(int argc, char* argv[]){
 			SumColorsB[_] = 0;
 			CountColors[_] = 0;
 		}
-		Threads.clear();
-		Threads.resize((int) MyPicture.info.Width);
+		//Threads.clear();
+		//Threads.resize((int) MyPicture.info.Width);
 		/*
 		for (int i = 0; i < (int) MyPicture.info.Width; ++i){
 			Threads[i].id = ThreadsCounter;
@@ -134,29 +140,29 @@ int main(int argc, char* argv[]){
 		for (int _ = 0; _ < K; ++_){
 			if (CountColors[_] != 0){
 				if (((int) round(((double) SumColorsR[_]) / ((double) CountColors[_]))) != centers[_].R){
-					cout << endl << (int) centers[_].R << " -R- ";
+					//cout << endl << (int) centers[_].R << " -R- ";
 					centers[_].R = (int) ((((double) SumColorsR[_]) / ((double) CountColors[_])) + 0.5);
-					cout << (int) centers[_].R << endl;
+					//cout << (int) centers[_].R << endl;
 					good = false;
 				}
 				if (((int) round(((double) SumColorsG[_]) / ((double) CountColors[_]))) != centers[_].G){
-					cout << endl << (int) centers[_].G << " -G- ";
+					//cout << endl << (int) centers[_].G << " -G- ";
 					centers[_].G = (int) ((((double) SumColorsG[_]) / ((double) CountColors[_])) + 0.5);
-					cout << (int) centers[_].G << endl;
+					//cout << (int) centers[_].G << endl;
 					good = false;
 				}
 				if (((int) round(((double) SumColorsB[_]) / ((double) CountColors[_]))) != centers[_].B){
-					cout << endl << (int) centers[_].B << " -B- ";
+					//cout << endl << (int) centers[_].B << " -B- ";
 					centers[_].B = (int) ((((double) SumColorsB[_]) / ((double) CountColors[_])) + 0.5);
-					cout << (int) centers[_].B << endl;
+					//cout << (int) centers[_].B << endl;
 					good = false;
 				}
 			}
 			else{
-				cerr << centers[_].R << " " << centers[_].G << " " << centers[_].B << endl;
+				//cerr << centers[_].R << " " << centers[_].G << " " << centers[_].B << endl;
 			}
 		}
-		good = true;
+		//good = true;
 		/*
 		cerr << endl;
 		cerr << (int) centers[0].R << " " << (int) centers[0].G << " " << (int) centers[0].B << endl;
@@ -170,6 +176,11 @@ int main(int argc, char* argv[]){
 		}
 		*/
 	}
+
+	clock_gettime(CLOCK_REALTIME, &StartTimespec /*clockid_t clk_id, struct timespec *res*/);
+	printf("%f\n", (double) StartTimespec.tv_sec + (double) StartTimespec.tv_nsec / 1000000000. - Start);
+	//cout << clock_getres(CLOCK_REALTIME, &StartTimespec /*clockid_t clk_id, struct timespec *res*/) /* - Start*/ << endl;
+
 	MyPictureFile OutFile0;
 	OutFile0.type = 2;
 	FILE * File0 = fopen("out0.bmp", "w");

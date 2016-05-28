@@ -18,6 +18,8 @@
 #include <mutex>
 #include <atomic>
 
+#include <time.h>
+
 using namespace std; //is very bad
 
 const Color White = Color(255, 255, 255);
@@ -26,7 +28,7 @@ const Color Green = Color(0, 255, 0);
 
 const int K = 50;
 
-const int NomberOfThreads = 10;
+int NomberOfThreads = 5;
 
 pthread_barrier_t MyBarrier;
 //pthread_barrier_t OtherBarrier;
@@ -74,11 +76,8 @@ public:
 	//mutex * lock;
 	//bool main;
 	void run(){
-		iter();
-	}
-	void iter(){
 		good = false;
-		cerr << "thread: " << id << endl;
+		//cerr << "thread: " << id << endl;
 		while (not good){
 			for (int _ = 0; _ < K; ++_){
 				SumColorsR[_] = 0;
@@ -106,7 +105,7 @@ public:
 			for (int _ = 0; _ < K; ++_){
 				deleteme += CountColors[_];
 			}
-			cerr << "CountColors: " << deleteme << endl;
+			//cerr << "CountColors: " << deleteme << endl;
 			pthread_barrier_wait(&MyBarrier);
 			//cout << "thread | : " << id << endl;
 			if (id == 0){
@@ -148,31 +147,33 @@ public:
 			for (int i = 0; i < NomberOfThreads; ++i){
 				CC[_] += (*friends)[i] -> CountColors[_];
 			}
+			/*
 			cerr << "SCR: " << SCR[_] << " ";
 			cerr << "SCG: " << SCG[_] << " ";
 			cerr << "SCB: " << SCB[_] << " ";
 			cerr << "CC: " << CC[_] << endl;
+			*/
 		}
 		good = true;
 		for (int _ = 0; _ < K; ++_){
 			//cerr << "(" << (int) centers[_].R << " " << (int) centers[_].G << " " << (int) centers[_].B << ") - ";
 			if (CC[_] != 0){
 				if ((int) ((((double) SCR[_]) / ((double) CC[_])) + 0.5) != centers[_].R){
-					cout << endl << (int) centers[_].R << " -R- ";
+					//cout << endl << (int) centers[_].R << " -R- ";
 					centers[_].R = (int) ((((double) SCR[_]) / ((double) CC[_])) + 0.5);
-					cout << (int) centers[_].R << endl;
+					//cout << (int) centers[_].R << endl;
 					good = false;
 				}
 				if ((int) ((((double) SCG[_]) / ((double) CC[_])) + 0.5) != centers[_].G){
-					cout << endl << (int) centers[_].G << " -G- ";
+					//cout << endl << (int) centers[_].G << " -G- ";
 					centers[_].G = (int) ((((double) SCG[_]) / ((double) CC[_])) + 0.5);
-					cout << (int) centers[_].G << endl;
+					//cout << (int) centers[_].G << endl;
 					good = false;
 				}
 				if ((int) ((((double) SCB[_]) / ((double) CC[_])) + 0.5) != centers[_].B){
-					cout << endl << (int) centers[_].B << " -B- ";
+					//cout << endl << (int) centers[_].B << " -B- ";
 					centers[_].B = (int) ((((double) SCB[_]) / ((double) CC[_])) + 0.5);
-					cout << (int) centers[_].B << endl;
+					//cout << (int) centers[_].B << endl;
 					good = false;
 				}
 				//cerr << "(" << (int) centers[_].R << " " << (int) centers[_].G << " " << (int) centers[_].B << ") - ";
@@ -182,7 +183,7 @@ public:
 //				cerr << endl << (int)centers[_].R << " " << (int) centers[_].G << " " << (int) centers[_].B << endl;
 			}
 		}
-		cerr << endl;
+		//cerr << endl;
 		//good = true;
 		for (int i = 0; i < NomberOfThreads; ++i){
 			//(*friends)[i] -> questions.clear();
@@ -258,6 +259,18 @@ int main(int argc, char* argv[]){
 		centers[_].G = rand() % 255;
 		centers[_].B = rand() % 255;
 	}
+
+	timespec StartTimespec;
+	clock_gettime(CLOCK_REALTIME, &StartTimespec /*clockid_t clk_id, struct timespec *res*/);
+	double Start = (double) StartTimespec.tv_sec + (double) StartTimespec.tv_nsec / 1000000000.;
+	/*
+	cout << Start << endl;
+	Start = StartTimespec.tv_nsec;
+	cout << Start << endl;
+	Start = StartTimespec.tv_nsec;
+	cout << Start << endl;
+	Start = StartTimespec.tv_nsec;
+	*/
 
 	vector<MyData *> Threads(NomberOfThreads);
 
@@ -438,6 +451,11 @@ int main(int argc, char* argv[]){
 	/*
 	}
 	*/
+
+	clock_gettime(CLOCK_REALTIME, &StartTimespec /*clockid_t clk_id, struct timespec *res*/);
+	printf("%f\n", (double) StartTimespec.tv_sec + (double) StartTimespec.tv_nsec / 1000000000. - Start);
+	//cout << StartTimespec.tv_nsec - Start << endl;
+
 	MyPictureFile OutFile0;
 	OutFile0.type = 2;
 	FILE * File0 = fopen("out0.bmp", "w");

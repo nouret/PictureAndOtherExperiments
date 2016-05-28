@@ -18,7 +18,7 @@ try.o: try.cpp
 
 git:
 	git add *.cpp *.h Makefile CommitNomber *.py *.bmp
-	git commit -m "auto 17"
+	git commit -m "auto 18"
 	git push
 	python3 massage.py > Makefile2
 	mv Makefile2 Makefile
@@ -54,22 +54,22 @@ noise.o: noise.cpp MyPictureFile.h BMP.h random.h
 	g++ -c noise.cpp
 
 main: main.o
-	g++ -pthread main.o -o main -std=c++11
+	g++ -pthread main.o -o main -std=c++11 -lrt
 	./main < Без\ имени\(копия\).bmp
 	#./main < qwerty.bmp
 	make clean
 
 mainfast: mainfast.o
-	g++ -fopenmp mainfast.o -o mainfast
+	g++ -fopenmp mainfast.o -o mainfast -lrt
 	./mainfast < Без\ имени\(копия\).bmp
 	#./main < qwerty.bmp
 	make clean
 
 mainfast.o: mainfast.cpp MyPictureFile.h BMP.h random.h
-	g++ -fopenmp -c mainfast.cpp -o mainfast.o
+	g++ -fopenmp -c mainfast.cpp -o mainfast.o -lrt
 
 main.o: main.cpp MyPictureFile.h BMP.h random.h
-	g++ -pthread -c main.cpp -std=c++11
+	g++ -pthread -c main.cpp -std=c++11 -lrt
 
 try_mutex: try_mutex.o
 	g++ try_mutex.o -o try_mutex.out -fopenmp
@@ -83,4 +83,3 @@ clean:
 	rm -rf try.o try deleteme.o deleteme Imj.o Imj qwe.o qwe main.o main noise.o noise
 	rm -rf try2 try2.o pragma pragma.o mainfast.o mainfast
 	rm -rf try_mutex.out try_mutex.o
-
